@@ -8,6 +8,7 @@ from textual.widget import Widget
 
 from rich.align import Align
 from rich.panel import Panel
+from rich.pretty import Pretty
 from textual.message import Message
 
 
@@ -18,29 +19,17 @@ class DebugStatus(Message):
 
 
 class StatusWidget(Widget):
-    alive: Reactive = Reactive(True)
-    points: Reactive = Reactive(0)
-    pos: Reactive = Reactive((0, 0))
-    debug: Reactive = Reactive("")
+    last_info: Reactive = Reactive("")
+    debug: Reactive = Reactive({})
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
     def render(self) -> RenderableType:
-        w = (
-            f"Alive: [b red]{self.alive}[/b red] :red_heart:"
-            f"\n\n"
-            f"Points: [b red]{self.points}[/b red] :glowing_star:"
-            f"\n\n"
-            f"Pos: [b red]{self.pos}[/b red]"
-            f"\n\n"
-            f"[b blue]{self.debug}[/b blue]"
-        )
+        # OverflowMethod = Literal["fold", "crop", "ellipsis", "ignore"]
+
         return Panel(
-            Align.center(
-                w,
-                vertical="middle",
-            ),
+            Pretty(self.debug),
             title="Status",
             style="yellow",
         )

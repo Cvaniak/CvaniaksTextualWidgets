@@ -14,6 +14,7 @@ from textual.message import Message, MessageTarget
 
 from rich.panel import Panel
 from rich.box import Box, ROUNDED
+from rich.repr import Result
 
 from typing import Optional
 from typing import List
@@ -30,9 +31,7 @@ def minmax(a, mn, mx):
 
 
 # TODO: Emit
-# Horizontal or Vertical
 # Box or without box
-# With label or without label
 # Display value outside
 # Display value inside
 # Height from value or map value
@@ -74,8 +73,11 @@ def create_gradient(color_a: Color | str, color_b: Color | str, n) -> List[Color
 
 
 class ProgressBarChange(Message):
-    def __init__(self, sender: MessageTarget) -> None:
+    def __init__(self, sender: _ProgressBar) -> None:
         super().__init__(sender)
+        self.value = sender.value
+        self.fill = sender.fill
+        self.max_value = sender._max_value
 
 
 class _ProgressBar(Widget):
@@ -86,6 +88,8 @@ class _ProgressBar(Widget):
     def __init__(
         self,
         start_value: int = 0,
+        max_value: int | None = None,
+        name: str | None = None,
         color: Optional[str | Color | List[Color | str]] = None,
         width: Optional[int] = None,
         height: Optional[int] = None,
@@ -97,17 +101,32 @@ class _ProgressBar(Widget):
         *args,
         **kwargs,
     ) -> None:
-        super().__init__(*args, **kwargs)
+        super().__init__(name=name)
         self.color = color
-        self.value = start_value
-        self.fill = start_value
-        self._width = width
-        self._height = height
         self.label = label
         self.label_align: AlignMethod = label_align
         self.label_position = label_position
         self.border_style = border_style
         self.box = box
+
+        self._set_size_and_values(start_value, max_value, width, height)
+
+    def __rich_repr__(self) -> Result:
+        # yield self.name
+        yield self.fill, self.value
+
+    def __repr__(self):
+        return f"{self.fill}, {self.value}"
+
+    def _set_size_and_values(self, start_value, max_value, width, height):
+        if max_value:
+            self._height = max_value + 2
+        else:
+            self._height = height
+
+        self.value = start_value
+        self.fill = self.value
+        self._width = width
 
     @property
     def width(self) -> int:
@@ -134,7 +153,7 @@ class _ProgressBar(Widget):
         return self.fill
 
     @property
-    def _max_fill(self):
+    def _max_value(self):
         return self._max_height
 
     def _color_xy(self, x, y):
@@ -188,20 +207,19 @@ class _ProgressBar(Widget):
         )
 
     async def on_mouse_down(self, event: events.MouseDown) -> None:
-        self.fill = minmax(self._mouse_axis(event) - 1, 0, self._max_fill)
+        self.fill = minmax(self._mouse_axis(event) - 1, 0, self._max_value)
         self.value = self.fill
         self.is_mouse_down = True
         await self.emit(ProgressBarChange(self))
 
     async def on_mouse_move(self, event: events.MouseMove) -> None:
         if self.is_mouse_down:
-            self.fill = minmax(self._mouse_axis(event) - 1, 0, self._max_fill)
+            self.fill = minmax(self._mouse_axis(event) - 1, 0, self._max_value)
             await self.emit(ProgressBarChange(self))
-        await self.emit(DebugStatus(self, self.color))
 
     async def on_mouse_up(self, event: events.MouseUp):
         if self.is_mouse_down:
-            self.fill = minmax(self._mouse_axis(event) - 1, 0, self._max_fill)
+            self.fill = minmax(self._mouse_axis(event) - 1, 0, self._max_value)
             self.value = self.fill
             self.is_mouse_down = False
             await self.emit(ProgressBarChange(self))
@@ -217,6 +235,16 @@ class ProgressBarV(_ProgressBar):
 
 
 class ProgressBarH(_ProgressBar):
+    def _set_size_and_values(self, start_value, max_value, width, height):
+        if max_value:
+            self._width = max_value + 2
+        else:
+            self._width = width
+
+        self.value = start_value
+        self.fill = self.value
+        self._height = height
+
     @property
     def _fill_width(self) -> int:
         return self.fill
@@ -229,7 +257,7 @@ class ProgressBarH(_ProgressBar):
         return event.x
 
     @property
-    def _max_fill(self):
+    def _max_value(self):
         return self._max_width
 
     def _color_xy(self, x, y):
