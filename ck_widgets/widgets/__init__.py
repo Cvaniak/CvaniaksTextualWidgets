@@ -1,2 +1,2 @@
-from .debug_bar import StatusWidget, DebugStatus
-from .color_bar import ProgressBarV, ProgressBarH, ProgressBarChange, create_gradient
+from .debug_window import DebugWindow, DebugStatus
+from .value_bar import ValueBarV, ValueBarH, ValueBarChange, create_gradient

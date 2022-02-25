@@ -2,13 +2,16 @@ from __future__ import annotations
 
 import sys
 from rich.console import RenderableType
+from rich.segment import Segment
 import textual
 from textual.reactive import Reactive
 from textual.widget import Widget
 
+from rich import box
 from rich.align import Align
 from rich.panel import Panel
 from rich.pretty import Pretty
+from rich.text import Text
 from textual.message import Message
 
 
@@ -18,9 +21,9 @@ class DebugStatus(Message):
         self.mes = mes
 
 
-class StatusWidget(Widget):
+class DebugWindow(Widget):
     last_info: Reactive = Reactive("")
-    debug: Reactive = Reactive({})
+    debug: Reactive = Reactive("")
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -29,7 +32,9 @@ class StatusWidget(Widget):
         # OverflowMethod = Literal["fold", "crop", "ellipsis", "ignore"]
 
         return Panel(
-            Pretty(self.debug),
-            title="Status",
+            self.debug,
+            title="Debug Window",
             style="yellow",
+            box=box.HEAVY,
+            border_style="red",
         )

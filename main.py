@@ -8,61 +8,118 @@ from textual.widget import Widget
 from textual import events
 
 from textual.app import App
+from rich import box
+from rich.color import Color
 
-from ck_widgets.widgets import ProgressBarChange
-from ck_widgets.widgets import ProgressBarV, ProgressBarH
+
+from ck_widgets.widgets import ValueBarChange
+from ck_widgets.widgets import ValueBarV, ValueBarH
 from ck_widgets.widgets import create_gradient
-from ck_widgets.widgets import StatusWidget, DebugStatus
+from ck_widgets.widgets import DebugWindow, DebugStatus
 
 
 def create_horizontal():
-    gradient = create_gradient("red", "green", 28)
-    gradient2 = create_gradient("rgb(39, 75, 123)", "rgb(200, 100, 10)", 119)
+    red_green_40 = create_gradient("red", "green", 40)
+    blue_orange_121 = create_gradient("rgb(39, 75, 123)", "rgb(200, 100, 10)", 121)
+    red_and_white_black_100 = create_gradient("white", "black", 100)
+    red_and_white_black_100[:5] = ["red"] * 5
+    black_blue_121 = create_gradient("black", "blue", 121)
     l = {
-        "r1": ProgressBarH(color=["white", "black"]),
-        "r2": ProgressBarH(
-            color=gradient,
-            label="test",
+        "r1": ValueBarH(max_value=30),
+        "r2": ValueBarH(
+            label="Heavy box, two colors, one after another, reversed",
+            color=["white", "black"],
+            back_ground_color=["green", "blue"],
+            max_value=80,
+            start_value=40,
+            box=box.HEAVY,
+            reversed=True,
+        ),
+        "r3": ValueBarH(
+            color=red_green_40,
+            back_ground_color="yellow",
+            start_value=20,
+            label="short",
             label_align="left",
             border_style="red",
-            height=5,
-            width=30,
+            height=3,
+            width=40,
         ),
-        "r3": ProgressBarH(
-            color=gradient2,
-            label="Another Test",
+        "r4": ValueBarH(
+            color=blue_orange_121,
+            label="Reversed",
             label_align="right",
+            label_position="bottom",
             border_style="blue",
-            height=5,
+            start_value=55,
+            width=70,
+            reversed=True,
         ),
-        "r4": ProgressBarH(),
-        "r5": ProgressBarH(),
+        "r5": ValueBarH(
+            color=red_and_white_black_100,
+            label="Ugly but with background",
+            label_align="center",
+            label_position="bottom",
+            border_style="black on white",
+            start_value=80,
+            width=200,
+            max_value=100,  # Max value overide width
+        ),
+        "r6": ValueBarH(
+            color=black_blue_121,
+            label="Full range",
+            label_align="right",
+            label_position="top",
+            border_style="rgb(11,100,33)",
+            start_value=121,
+            max_value=121,
+        ),
     }
     return l
 
 
 def create_vertical():
-    gradient = create_gradient("red", "green", 28)
-    gradient2 = create_gradient("rgb(39, 75, 123)", "rgb(200, 100, 10)", 28)
+    color_list = [
+        "rgb(10, 120, 10)",
+        "black",
+        "green",
+        "blue",
+        Color.from_rgb(10, 50, 100),
+    ]
+    green_black_30 = create_gradient(Color.from_rgb(30, 200, 30), "black", 30)
+    red_black_30 = create_gradient(Color.from_rgb(200, 30, 30), "black", 30)
     l = {
-        "c1": ProgressBarV(color=["white", "black"]),
-        "c2": ProgressBarV(
-            color=gradient,
-            label="test",
-            label_align="left",
-            border_style="red",
-            height=5,
-            width=30,
+        "c1": ValueBarV(max_value=30),
+        "c2": ValueBarV(
+            color=["white", "black"],
+            back_ground_color=["green", "blue"],
+            start_value=10,
+            max_value=20,
+            padding=(0, 1),
         ),
-        "c3": ProgressBarV(
-            color=gradient,
-            label="Another Test",
-            label_align="right",
+        "c3": ValueBarV(
+            label="short",  # It forces width
+            height=10,
+            start_value=30,
             border_style="blue",
-            height=5,
+            box=box.SQUARE,
+            width=5,
+            padding=(1, 0),
         ),
-        "c4": ProgressBarV(),
-        "c5": ProgressBarV(),
+        "c4": ValueBarV(
+            color=color_list,
+            start_value=30,
+            max_value=25,
+            border_style="yellow on black",
+            padding=(0, 1),
+        ),
+        "c5": ValueBarV(
+            color=green_black_30,
+            back_ground_color=red_black_30,
+            height=120,
+            max_value=30,
+            start_value=15,
+        ),
     }
     return l
 
@@ -84,10 +141,10 @@ class Layout(GridView):
         self.grid.set_align("center", "center")
 
         # Create rows / columns / areas
-        self.grid.add_column("col", fraction=10)
+        self.grid.add_column("col", fraction=10, min_size=121)
         self.grid.add_column("cl", repeat=6, fraction=1)
         self.grid.add_row("row", fraction=3)
-        self.grid.add_row("rw", fraction=1, repeat=5)
+        self.grid.add_row("rw", fraction=1, repeat=6)
 
         self.grid.add_areas(st="col,row")
         self.grid.place(st=self.status)
@@ -95,7 +152,7 @@ class Layout(GridView):
         for i in range(1, 7):
             self.grid.add_areas(**{f"r{i}": f"col,rw{i}"})
         for i in range(1, 6):
-            self.grid.add_areas(**{f"c{i}": f"cl{i},row-start|rw3-end"})
+            self.grid.add_areas(**{f"c{i}": f"cl{i},row-start|rw6-end"})
 
         self.grid.place(**create_horizontal())
         self.grid.place(**create_vertical())
@@ -111,7 +168,7 @@ class SimpleApp(App):
 
     async def on_mount(self) -> None:
 
-        self.status = StatusWidget()
+        self.status = DebugWindow()
         self.layout = Layout(self.status)
         await self.view.dock(Header(), edge="top")
         await self.view.dock(Footer(), edge="bottom")
@@ -120,13 +177,13 @@ class SimpleApp(App):
     async def handle_debug_status(self, message: DebugStatus):
         self.status.debug = message.mes
 
-    async def handle_progress_bar_change(self, message: ProgressBarChange):
+    async def handle_value_bar_change(self, message: ValueBarChange):
         self.debug[message.sender.name] = (
-            message.fill,
-            message.value,
-            message.max_value,
+            f"[blue]Fill: [green]{message.fill}[/green] "
+            f"Value: [yellow]{message.value}[/yellow]/[red]{message.max_value}[/red][/blue]"
         )
-        self.status.debug = self.debug
+        t = str(self.debug).replace(", ", "\n")[1:-1]
+        self.status.debug = t
         self.status.refresh()
 
 
