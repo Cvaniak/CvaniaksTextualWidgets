@@ -1,0 +1,11 @@
+__pycache__/
+*/__pycache__/
+build/
+venv/
+not/
+dist/
+*.egg-info/
+*.pyc
+*.vim
+test.py
+./main.py
