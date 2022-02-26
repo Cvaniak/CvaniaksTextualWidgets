@@ -5,9 +5,15 @@ This is list of Widgets for [Textual](https://github.com/Textualize/textual) fra
 > ⚠ **NOTE:** This project widgets names, arguments, etc. can vary along diffrent versions.
 
 # Install
+This is pip package so you can install it using command below:
+```bash
+pip3 install ck-widgets
+# or 
+python3 -m pip install ck-widgets
+```
 
 # ValueBar
-![CoolBarGif](https://raw.githubusercontent.com/Cvaniak/CvaniaksTextualWidgets/master/documentation/NiveValueBar.gif)  
+![CoolBarGif](https://github.com/Cvaniak/CvaniaksTextualWidgets/blob/progress-bar/documentation/NiceValueBar.gif?raw=true)  
 <details>
 <summary>Examples</summary>
 
@@ -23,7 +29,7 @@ vbar_vertical = ValueBarV(max_value=50)
 
 And here is example with almost all arguments:
 
-![Example with many arguments](https://raw.githubusercontent.com/Cvaniak/CvaniaksTextualWidgets/master/documentation/ValueBarArguments.png)  
+![Example with many arguments](https://github.com/Cvaniak/CvaniaksTextualWidgets/blob/progress-bar/documentation/ValueBarArguments.png?raw=true)
 
 ```python
 # Example with almost all arguments
@@ -50,7 +56,8 @@ ValueBarH(
 ```  
 
 And this example:  
-![LotOfValueBars](https://raw.githubusercontent.com/Cvaniak/CvaniaksTextualWidgets/master/documentation/ValueBarArguments.png)  
+![LotOfValueBars](https://github.com/Cvaniak/CvaniaksTextualWidgets/blob/progress-bar/documentation/FullUglyDemo.png?raw=true)
+
 you can check code in this file `ck_widgets/exmples/value_bar.py` or test it by using command below:  
 
 ```bash
