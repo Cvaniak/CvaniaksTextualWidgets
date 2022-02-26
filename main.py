@@ -1,3 +1,4 @@
+from typing import List
 from rich import align
 from textual.app import App
 from textual.reactive import Reactive
@@ -14,22 +15,22 @@ from rich.color import Color
 
 from ck_widgets.widgets import ValueBarChange
 from ck_widgets.widgets import ValueBarV, ValueBarH
-from ck_widgets.widgets import create_gradient
 from ck_widgets.widgets import DebugWindow, DebugStatus
+from ck_widgets.color import CustomColor, create_gradient
 
 
 def create_horizontal():
-    red_green_40 = create_gradient("red", "green", 40)
-    blue_orange_121 = create_gradient("rgb(39, 75, 123)", "rgb(200, 100, 10)", 121)
+    red_green_40 = CustomColor.gradient("red", "green")
+    blue_orange_121 = CustomColor.gradient("rgb(39, 75, 123)", "rgb(200, 100, 10)")
     red_and_white_black_100 = create_gradient("white", "black", 100)
     red_and_white_black_100[:5] = ["red"] * 5
-    black_blue_121 = create_gradient("black", "blue", 121)
+    black_blue_121 = CustomColor.gradient("black", "blue", 121)
     l = {
         "r1": ValueBarH(max_value=30),
         "r2": ValueBarH(
             label="Heavy box, two colors, one after another, reversed",
             color=["white", "black"],
-            back_ground_color=["green", "blue"],
+            bg_color=["green", "blue"],
             max_value=80,
             start_value=40,
             box=box.HEAVY,
@@ -37,7 +38,7 @@ def create_horizontal():
         ),
         "r3": ValueBarH(
             color=red_green_40,
-            back_ground_color="yellow",
+            bg_color="yellow",
             start_value=20,
             label="short",
             label_align="left",
@@ -47,7 +48,8 @@ def create_horizontal():
         ),
         "r4": ValueBarH(
             color=blue_orange_121,
-            label="Reversed",
+            label="Reversed and instant",
+            instant=True,
             label_align="right",
             label_position="bottom",
             border_style="blue",
@@ -64,6 +66,7 @@ def create_horizontal():
             start_value=80,
             width=200,
             max_value=100,  # Max value overide width
+            padding=(0, 3),
         ),
         "r6": ValueBarH(
             color=black_blue_121,
@@ -86,36 +89,35 @@ def create_vertical():
         "blue",
         Color.from_rgb(10, 50, 100),
     ]
-    green_black_30 = create_gradient(Color.from_rgb(30, 200, 30), "black", 30)
-    red_black_30 = create_gradient(Color.from_rgb(200, 30, 30), "black", 30)
+    green_black_30 = CustomColor.gradient(Color.from_rgb(30, 200, 30), "black")
+    red_black_30 = CustomColor.gradient(Color.from_rgb(200, 30, 30), "black")
     l = {
         "c1": ValueBarV(max_value=30),
         "c2": ValueBarV(
             color=["white", "black"],
-            back_ground_color=["green", "blue"],
+            bg_color=["red", "black"],
             start_value=10,
             max_value=20,
             padding=(0, 1),
         ),
         "c3": ValueBarV(
-            label="short",  # It forces width
             height=10,
             start_value=30,
             border_style="blue",
             box=box.SQUARE,
             width=5,
-            padding=(1, 0),
+            padding=(2, 0),
         ),
         "c4": ValueBarV(
             color=color_list,
             start_value=30,
             max_value=25,
             border_style="yellow on black",
-            padding=(0, 1),
+            padding=(4, 1),
         ),
         "c5": ValueBarV(
             color=green_black_30,
-            back_ground_color=red_black_30,
+            bg_color=red_black_30,
             height=120,
             max_value=30,
             start_value=15,

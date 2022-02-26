@@ -8,7 +8,7 @@ This is list of Widgets for [Textual]() framework, created from my personal need
 
 # ValueBar
 <details>
-<summary>Example</summary>
+<summary>Examples</summary>
 
 </details>
 <details>
@@ -22,14 +22,13 @@ This is list of Widgets for [Textual]() framework, created from my personal need
 * Be sure that provide all arguments
 * Test edge cases
 * Clean up how to provide color
-* Background color list
 * Label on left or right site
 </details>
 
 
 # Change Log
 
-## [0.1.0] - 2022-02-25
+## [0.1.0] - 2022-02-26
 
 ### Added
 * ValueBar

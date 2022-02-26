@@ -18,7 +18,9 @@ from rich.box import Box, ROUNDED
 from rich.repr import Result
 
 from typing import Optional
-from typing import List, Tuple
+from typing import List, Tuple, Union
+
+from ck_widgets.color import CColor, CustomColor
 
 if sys.version_info >= (3, 8):
     from typing import Literal
@@ -30,46 +32,7 @@ def minmax(a, mn, mx):
     return max(min(mx, a), mn)
 
 
-# TODO: Emit
-# Box or without box
-# Display value outside
-# Display value inside
-# Height from value or map value
-# Style
-# Gradient color
-# Full custom color
-# border color
-# Text color
-# On hover color change
-
-# style
-# # Box type or none
-# # Border color
-# # Text
-# label
-# label_position
-# height
-# width
-# value == size
-# size == value
-
-
 LabelPosition = Literal["top", "bottom"]
-
-
-def create_gradient(color_a: Color | str, color_b: Color | str, n) -> List[Color]:
-    if isinstance(color_a, str):
-        a = Color.parse(color_a)
-        a = a.get_truecolor()
-    else:
-        a = color_a.get_truecolor()
-    if isinstance(color_b, str):
-        b = Color.parse(color_b)
-        b = b.get_truecolor()
-    else:
-        b = color_b.get_truecolor()
-
-    return [Color.from_triplet(blend_rgb(a, b, x / n)) for x in range(n)]
 
 
 class ValueBarChange(Message):
@@ -95,8 +58,9 @@ class _ValueBar(Widget):
         start_value: int = 0,
         max_value: int | None = None,
         reversed: bool = False,
-        color: Optional[str | Color | List[Color | str]] = None,
-        back_ground_color: Optional[str | Color | List[Color | str]] = None,
+        instant: bool = False,
+        color: Optional[Union[CColor, List[CColor], CustomColor]] = None,
+        bg_color: Optional[Union[CColor, List[CColor], CustomColor]] = None,
         width: Optional[int] = None,
         height: Optional[int] = None,
         label: Optional[TextType] = None,
@@ -105,8 +69,6 @@ class _ValueBar(Widget):
         padding: Tuple[int, int] = (0, 0),
         border_style: StyleType = "none",
         box: Box = ROUNDED,
-        *args,
-        **kwargs,
     ) -> None:
         """ValueBar constructor
 
@@ -119,8 +81,9 @@ class _ValueBar(Widget):
             max_value: Maximal value that also defines size of widget
             (it overides width for Horizontal and hight for Vertical)
             reversed: Reverse direction of progress
+            instant: If update should be after mouse release or not
             color: Color of progress in bar. Can be setup as list of colors
-            back_ground_color: Background color of progress in bar. Can be setup as (`List[Color]`)
+            bg_color: Background color of progress in bar. Can be setup as (`List[Color]`)
             width: Width of widget
             height: Height of widget
             label: Text displayed in Panel's border
@@ -131,36 +94,37 @@ class _ValueBar(Widget):
             box: Rich's box type
 
         """
-
+ 
         super().__init__(name=name)
         self.color = color
-        self.back_ground_color = back_ground_color
+        self.bg_color = bg_color
         self.label = label
         self.label_align: AlignMethod = label_align
         self.label_position = label_position
-        self.border_style = border_style
+        self._border_style = border_style
         self.box = box
         self.reversed = reversed
+        self.instant = instant
         self._padding: Tuple[int, int] = padding
 
         self._set_size_and_values(start_value, max_value, width, height)
 
     def __rich_repr__(self) -> Result:
         yield self.name
-        yield self.fill, self.value
+        yield self.fill, self.value, self._max_value
 
     def __repr__(self):
         return f"{self.fill}, {self.value}"
 
     def _set_size_and_values(self, start_value, max_value, width, height):
         if max_value:
-            self._height = max_value
+            self._height = max_value+self._padding[0]*2+2
         elif height:
             self._height = height
         else:
             raise KeyError("max_value or height must be filled")
 
-        self.value = min(start_value, self._height)
+        self.value = minmax(start_value, 0, self._max_value)
         self.fill = self.value
         self._width = width
 
@@ -197,17 +161,27 @@ class _ValueBar(Widget):
 
     def _color_xy(self, x, y, bg=False):
         if bg:
-            color = self.back_ground_color
+            color = self.bg_color
         else:
             color = self.color
+
         if isinstance(color, list):
             w = self._color_direction(x, y) % len(color)
             return color[w]
+        elif isinstance(color, CustomColor):
+            w = self._color_direction(x, y)
+            return color.get_color(w, self._max_value)
         else:
             return color
 
     def _mouse_axis(self, event) -> int:
-        return event.y
+        y = event.y
+        pad = self._padding[0]
+        if y < pad: 
+            return 0
+        if y >= self._max_value + pad:
+            return self._max_value
+        return y-pad
 
     def update(self, value):
         self.value = value
@@ -251,7 +225,7 @@ class _ValueBar(Widget):
             title_align=self.label_align,
             subtitle=subtitle,
             subtitle_align=self.label_align,
-            style=self.border_style,
+            style=self._border_style,
             box=self.box,
             height=self.height,
             width=self.width,
@@ -260,7 +234,8 @@ class _ValueBar(Widget):
         )
 
     def set_fill(self, event):
-        mn_mx = minmax(self._mouse_axis(event), 1, self._max_value)
+        mouse_axis = self._mouse_axis(event)
+        mn_mx = minmax(mouse_axis, 0, self._max_value)
         if self.reversed:
             self.fill = self._max_value - mn_mx
         else:
@@ -275,6 +250,8 @@ class _ValueBar(Widget):
     async def on_mouse_move(self, event: events.MouseMove) -> None:
         if self.is_mouse_down:
             self.set_fill(event)
+            if self.instant:
+                self.value = self.fill
             await self.emit(ValueBarChange(self))
 
     async def on_mouse_up(self, event: events.MouseUp):
@@ -294,7 +271,6 @@ class ValueBarV(_ValueBar):
     """
     ValueBar Vertical
     """
-
     ...
 
 
@@ -324,8 +300,15 @@ class ValueBarH(_ValueBar):
     def _fill_height(self) -> int:
         return self._max_height
 
-    def _mouse_axis(self, event) -> str:
-        return event.x
+    def _mouse_axis(self, event) -> int:
+        x = event.x
+        pad = self._padding[1]
+        if x < pad: 
+            return 0
+        if x >= self._max_value + pad:
+            return self._max_value
+        return x-pad
+
 
     @property
     def _max_value(self):
