@@ -10,7 +10,9 @@ This is list of Widgets for [Textual](https://github.com/Textualize/textual) fra
 ![CoolBarGif](https://raw.githubusercontent.com/Cvaniak/CvaniaksTextualWidgets/master/documentation/NiveValueBar.gif)  
 <details>
 <summary>Examples</summary>
+
 The simples example:
+
 ```python
 # Simples value bar
 from ck_widgets.widgets import ValueBarH, ValueBarV
@@ -20,7 +22,9 @@ vbar_vertical = ValueBarV(max_value=50)
 ```  
 
 And here is example with almost all arguments:
+
 ![Example with many arguments](https://raw.githubusercontent.com/Cvaniak/CvaniaksTextualWidgets/master/documentation/ValueBarArguments.png)  
+
 ```python
 # Example with almost all arguments
 from ck_widgets.widgets import ValueBarH, CColor, CustomColor
@@ -48,9 +52,11 @@ ValueBarH(
 And this example:  
 ![LotOfValueBars](https://raw.githubusercontent.com/Cvaniak/CvaniaksTextualWidgets/master/documentation/ValueBarArguments.png)  
 you can check code in this file `ck_widgets/exmples/value_bar.py` or test it by using command below:  
+
 ```bash
 python3 -m ck_widgets.examples.value_bar
 ```
+
 </details>
 
 <details>
