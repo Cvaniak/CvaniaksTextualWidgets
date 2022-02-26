@@ -155,7 +155,7 @@ class Layout(GridView):
         # self.grid.place(r1=Placeholder())
 
 
-class SimpleApp(App):
+class ValueBarExample(App):
     debug: Reactive[dict] = Reactive({})
 
     async def on_load(self, _: events.Load) -> None:
@@ -183,4 +183,4 @@ class SimpleApp(App):
 
 
 if __name__ == "__main__":
-    SimpleApp.run()
+    ValueBarExample.run()

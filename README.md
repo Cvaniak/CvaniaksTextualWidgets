@@ -1,8 +1,8 @@
 # CvaniaK's Widgets for Textual TUI (`ck_widgets`)
 
-This is list of Widgets for [Textual]() framework, created from my personal need.
+This is list of Widgets for [Textual](https://github.com/Textualize/textual) framework, created from my personal need.
 
-> ⚠ **NOTE:** 
+> ⚠ **NOTE:** This project widgets names, arguments, etc. can vary along diffrent versions.
 
 # Install
 
@@ -28,6 +28,7 @@ This is list of Widgets for [Textual]() framework, created from my personal need
 * Test edge cases  
 * Clean up how to provide color  
 * Label on left or right site  
+* ...
 
 </details>
 
