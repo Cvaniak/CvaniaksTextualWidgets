@@ -13,6 +13,6 @@ setup(
     url="http://github.com/Cvaniak/CvaniaksTextualWidgets",
     author="Cvaniak",
     author_email="igna.cwaniak@gmail.com",
-    packages=find_packages(exclude=["not/"]),
+    packages=find_packages(exclude=["not"]),
     install_requires=["rich", "textual"],
 )

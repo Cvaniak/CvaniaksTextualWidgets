@@ -94,7 +94,7 @@ class _ValueBar(Widget):
             box: Rich's box type
 
         """
- 
+
         super().__init__(name=name)
         self.color = color
         self.bg_color = bg_color
@@ -118,7 +118,7 @@ class _ValueBar(Widget):
 
     def _set_size_and_values(self, start_value, max_value, width, height):
         if max_value:
-            self._height = max_value+self._padding[0]*2+2
+            self._height = max_value + self._padding[0] * 2 + 2
         elif height:
             self._height = height
         else:
@@ -177,11 +177,11 @@ class _ValueBar(Widget):
     def _mouse_axis(self, event) -> int:
         y = event.y
         pad = self._padding[0]
-        if y < pad: 
+        if y < pad:
             return 0
         if y >= self._max_value + pad:
             return self._max_value
-        return y-pad
+        return y - pad
 
     def update(self, value):
         self.value = value
@@ -271,6 +271,7 @@ class ValueBarV(_ValueBar):
     """
     ValueBar Vertical
     """
+
     ...
 
 
@@ -281,12 +282,11 @@ class ValueBarH(_ValueBar):
 
     def _set_size_and_values(self, start_value, max_value, width, height):
         if max_value:
-            self._width = max_value
+            self._width = max_value + self._padding[1] * 2 + 2
         elif width:
             self._width = width
         else:
             raise KeyError("max_value or width must be filled")
-        self._size = Size(self._width, self._size.height)
 
         self.value = min(start_value, self._max_width)
         self.fill = self.value
@@ -303,12 +303,11 @@ class ValueBarH(_ValueBar):
     def _mouse_axis(self, event) -> int:
         x = event.x
         pad = self._padding[1]
-        if x < pad: 
+        if x < pad:
             return 0
         if x >= self._max_value + pad:
             return self._max_value
-        return x-pad
-
+        return x - pad
 
     @property
     def _max_value(self):

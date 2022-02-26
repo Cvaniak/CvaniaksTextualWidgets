@@ -5,7 +5,8 @@ from textual.widgets import Footer, Header
 from textual import events
 
 from rich.color import Color
-from rich import box
+from rich import box, padding
+from ck_widgets.color.color_tools import CColor
 
 from ck_widgets.widgets import ValueBarChange
 from ck_widgets.widgets import ValueBarV, ValueBarH
@@ -137,22 +138,46 @@ class Layout(GridView):
         self.grid.set_align("center", "center")
 
         # Create rows / columns / areas
-        self.grid.add_column("col", fraction=10, min_size=121)
-        self.grid.add_column("cl", repeat=6, fraction=1)
+        self.grid.add_column("col", fraction=4)
+        self.grid.add_column("cl", fraction=3)
+        # self.grid.add_column("cl", repeat=6, fraction=1)
         self.grid.add_row("row", fraction=3)
-        self.grid.add_row("rw", fraction=1, repeat=6)
+        # self.grid.add_row("rw", fraction=1, repeat=6)
 
-        self.grid.add_areas(st="col,row")
-        self.grid.place(st=self.status)
+        # self.grid.add_areas(st="cl,row")
+        # self.grid.place(st=self.status)
 
-        for i in range(1, 7):
-            self.grid.add_areas(**{f"r{i}": f"col,rw{i}"})
-        for i in range(1, 6):
-            self.grid.add_areas(**{f"c{i}": f"cl{i},row-start|rw6-end"})
+        # for i in range(1, 7):
+        #     self.grid.add_areas(**{f"r{i}": f"col,rw{i}"})
+        # for i in range(1, 6):
+        #     self.grid.add_areas(**{f"c{i}": f"cl{i},row-start|rw6-end"})
 
-        self.grid.place(**create_horizontal())
-        self.grid.place(**create_vertical())
-        # self.grid.place(r1=Placeholder())
+        # self.grid.place(**create_horizontal())
+        # self.grid.place(**create_vertical())
+
+        from typing import List
+
+        background_color: List[CColor] = ["rgb(0,0,0)", "rgb(0,0,0)", "yellow"]
+        self.grid.place(
+            ValueBarH(
+                name="name_to_catch_in_event",
+                label="Almost all arguments",
+                label_align="left",
+                label_position="bottom",
+                start_value=25,
+                max_value=50,
+                height=6,
+                instant=True,
+                reversed=True,
+                color=CustomColor.gradient("green", "rgb(0, 100, 250)"),
+                bg_color=background_color,
+                border_style="yellow",
+                padding=(1,1),
+                box=box.DOUBLE_EDGE,
+                
+            ),
+            self.status,
+        )
 
 
 class SimpleApp(App):
@@ -165,16 +190,14 @@ class SimpleApp(App):
 
         self.status = DebugWindow()
         self.layout = Layout(self.status)
-        await self.view.dock(Header(), edge="top")
-        await self.view.dock(Footer(), edge="bottom")
         await self.view.dock(self.layout, edge="left")
 
     async def handle_debug_status(self, message: DebugStatus):
         self.status.debug = message.mes
 
     async def handle_value_bar_change(self, message: ValueBarChange):
-        self.debug[message.sender.name] = (
-            f"[blue]Fill: [green]{message.fill}[/green] "
+        self.debug["->"] = (
+            f"[blue][green]{message.fill}[/green] "
             f"Value: [yellow]{message.value}[/yellow]/[red]{message.max_value}[/red][/blue]"
         )
         t = str(self.debug).replace(", ", "\n")[1:-1]
