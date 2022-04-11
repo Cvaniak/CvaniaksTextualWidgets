@@ -114,7 +114,7 @@ from textual.events import Message
 from textual.app import App
 from textual import events
 
-from ck_widgets_lv import ListViewUo
+from ck_widgets.widgets import ListViewUo
 
 if __name__ == "__main__":
     from textual.widgets import Footer
