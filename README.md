@@ -56,7 +56,7 @@ ValueBarH(
 ```  
 
 And this example:  
-![LotOfValueBars](https://github.com/Cvaniak/CvaniaksTextualWidgets/blob/progress-bar/documentation/FullUglyDemo.png?raw=true)
+![LotOfValueBars](https://github.com/Cvaniak/CvaniaksTextualWidgets/blob/main/documentation/FullUglyDemo.png?raw=true)
 
 you can check code in this file `ck_widgets/exmples/value_bar.py` or test it by using command below:  
 
@@ -88,7 +88,7 @@ python3 -m ck_widgets.examples.value_bar
 
 
 # ListViewUo
-![Image](https://github.com/Cvaniak/CvaniaksTextualWidgets/blob/progress-bar/documentation/ListViewDemo.gif?raw=true)  
+![Image](https://github.com/Cvaniak/CvaniaksTextualWidgets/blob/main/documentation/ListViewDemo.gif?raw=true)  
 While waiting for [ticket](https://github.com/Textualize/textual/projects/1#card-66941810) (also mentioned [here](https://github.com/Textualize/textual/discussions/196)) and official `ListView`, you can use this dirty version that allows you to scroll thrue list of widgets.  
 
 <details>
